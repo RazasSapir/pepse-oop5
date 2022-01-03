@@ -11,6 +11,12 @@ import pepse.world.Sky;
 import pepse.world.Terrain;
 
 public class PepseGameManger extends GameManager {
+
+    public static final int SEED = 42;
+
+    public PepseGameManger() {
+
+    }
     public PepseGameManger(String windowTitle, Vector2 windowDimensions) {
         super(windowTitle, windowDimensions);
     }
@@ -19,6 +25,6 @@ public class PepseGameManger extends GameManager {
     public void initializeGame(ImageReader imageReader, SoundReader soundReader, UserInputListener inputListener, WindowController windowController) {
         super.initializeGame(imageReader, soundReader, inputListener, windowController);
         Sky.create(this.gameObjects(), windowController.getWindowDimensions(), Layer.BACKGROUND);
-        new Terrain(this.gameObjects(), Layer.DEFAULT, windowController.getWindowDimensions(), 50).createInRange(0, (int) windowController.getWindowDimensions().x());
+        new Terrain(this.gameObjects(), Layer.DEFAULT, windowController.getWindowDimensions(), SEED).createInRange(0, (int) windowController.getWindowDimensions().x());
     }
 }
