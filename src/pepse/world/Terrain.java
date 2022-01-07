@@ -48,7 +48,7 @@ public class Terrain {
                 if (j < INTERACTIVE_DEPTH)
                     this.gameObjects.addGameObject(block, this.groundLayer);
                 else
-                    this.gameObjects.addGameObject(block, Layer.BACKGROUND);
+                    this.gameObjects.addGameObject(block, Layer.BACKGROUND + 10);
                 block.setTag(GROUND_BLOCK);
                 counter += 1;
             }
