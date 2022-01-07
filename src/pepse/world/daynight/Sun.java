@@ -9,6 +9,11 @@ import danogl.util.Vector2;
 import java.lang.Math;
 import java.awt.*;
 
+/**
+ * class to manage the sun object.
+ * It is in charge of presenting the sun and moving it around the screen
+ * @authors Raz Sapir and Ari Lehavi
+ */
 public class Sun {
     private static final Color BASIC_SUN_COLOR = Color.YELLOW;
     private static final String SUN_TAG = "sun";
@@ -22,8 +27,8 @@ public class Sun {
      * @param curr_obj object to move.
      */
     private static void setNewCenter(float curr_angle, GameObject curr_obj){
-        Vector2 new_place = middleScreen.add(new Vector2((float)Math.sin(Math.toRadians(curr_angle)),
-                (float)(-1 * Math.cos(Math.toRadians(curr_angle)))).mult(middleScreen.y()));
+        Vector2 new_place = middleScreen.add(new Vector2((float)Math.sin(Math.toRadians(curr_angle)) * middleScreen.y()
+                , (float)(-1 * Math.cos(Math.toRadians(curr_angle))) * middleScreen.y() * 0.7f));
         curr_obj.setCenter(new_place);
     }
 
@@ -51,7 +56,7 @@ public class Sun {
                 0f, // initial transition value
                 360f, // final transition value
                 Transition.LINEAR_INTERPOLATOR_FLOAT, // use a cubic interpolator
-                cycleLength, // transtion fully over half a day
+                cycleLength, // transition fully over half a day
                 Transition.TransitionType.TRANSITION_LOOP,
                 null); // nothing further to execute upon reaching final value
         return sun;

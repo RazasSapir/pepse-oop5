@@ -1,5 +1,45 @@
 raz.sapir 212928766
-ari.lehavi <ID>
+arile 324955756
 
 
-Differences between UML diagrams
+Differences between UML diagrams:
+
+    There weren't major changes between the UML diagrams.
+
+
+
+
+explanation on how we made the world endless:
+
+    We made the game world endless by managing only 3 screens at a time - the current screen the avatar is in,
+    and the screens adjacent to it from left and right. When the avatar crossed a certain screen, we deleted the screen
+    that was least close to him (if he moved right then we deleted the left screen and vice versa), and every objet on it:
+    leaves, animals and terrain. We also created a new screen and objects in it, so that the avatar will always be in the
+    middle screen. We used the random possible to restore tactics that was shown in the excercise instructions to fulfill
+    this task.
+
+explanation on implementation of the Tree package:
+
+    In order to create trees, we initialized the tree positions in the relevant screens every time we created a new
+    screen (as described above). In order to create the option to restore the tree's locations when we return to the relevant
+    screen, we gave the minimal value of the X coordinate of the screen as the seed to the randomizer in charge of creating
+    the trees in the relevant screen. Therefore, since the minimal x value of the screen is always the same when we create
+    a screen - it creates the same positions for trees.
+
+
+dilemmas and design decisions we made throughout the work:
+
+    Throughout the work process we encountered numerous dilemmas we had to tackle. First, a main dilemma we encountered
+    was hwo to create the feature of infinite world and yet to preserve the ground and tree positions on the screen -
+    as we described in detail earlier. In addition, a main design decision we made was to connect the trees and the leaves
+    in the game. All leaves are created from a tree - as it made it easier to return the leaves to their initial location after
+    their death, and to manage their cycle in the game. Besides that,
+
+
+the bonuses we implemented:
+
+    We implemented the "animal bonus" - animals are created on the terrain, that move right and left and jump vertically.
+    We did it by creating a random amount of animals that move in a random manner in every screen we initalized. With
+    the initialization of every screen, we decided on the amount of animals in the screen and the way they'll move in.
+    When we move a game screen (as described earlier), we make sure to erase the animals game objects from the object
+    list in order to make the program more efficient.

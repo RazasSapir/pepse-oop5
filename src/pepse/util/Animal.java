@@ -6,9 +6,13 @@ import danogl.gui.rendering.AnimationRenderable;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 import pepse.PepseGameManger;
-
 import java.util.Random;
 
+/**
+ * class to manage the Animal object that appears on the screen.
+ * It is in charge of presenting the animals and moving it automatically around the screen
+ * @authors Raz Sapir and Ari Lehavi
+ */
 public class Animal extends GameObject {
     private final Renderable imageStandingRenderer;
     private final AnimationRenderable animationRenderer;
@@ -27,16 +31,8 @@ public class Animal extends GameObject {
     private int onMovementHorizontalCounter = 50;
     private int onFlyCounter = 20;
 
-
-
-
-
-
-
-
     /**
      * Construct a new GameObject instance.
-     *
      * @param topLeftCorner Position of the object, in window coordinates (pixels).
      *                      Note that (0,0) is the top-left corner of the window.
      * @param dimensions    Width and height in window coordinates.
@@ -116,7 +112,12 @@ public class Animal extends GameObject {
         handle_renderer();
     }
 
-
+    /**
+     * handle the collision of an animal with the surface.
+     * in case it landed on the ground, it's y velocity turns to 0.
+     * @param other object to collide with
+     * @param collision the collision style
+     */
     @Override
     public void onCollisionEnter(GameObject other, Collision collision) {
         super.onCollisionEnter(other, collision);

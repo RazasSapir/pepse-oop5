@@ -8,13 +8,16 @@ import danogl.components.CoordinateSpace;
 
 import java.awt.*;
 
-
+/**
+ * class to manage the Night and day occurence in the game.
+ * It is in charge of changing the day on a fixed basis
+ * @authors Raz Sapir and Ari Lehavi
+ */
 public class Night {
 
     private static final Color BASIC_NIGHT_COLOR = Color.decode("#000000");
     private static final String NIGHT_TAG = "night";
     private static final Float MIDNIGHT_OPACITY = 0.5f;
-
 
     /**
      * create a Night GameObject - A black screen with fading in and out animations.

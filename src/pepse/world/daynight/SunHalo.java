@@ -8,11 +8,15 @@ import danogl.util.Vector2;
 
 import java.awt.*;
 
+/**
+ * class to manage the sun halo object.
+ * It is in charge of presenting the sun halo based on the sun's position in every iteration
+ * @authors Raz Sapir and Ari Lehavi
+ */
 public class SunHalo {
     private static final Vector2 HALO_SIZE = new Vector2(200, 200);
     private static final Color BASIC_SUN_HALO_COLOR = new Color(255, 255, 0, 20);
     private static final String SUN_HALO_TAG = "sun halo";
-
 
     /**
      *
