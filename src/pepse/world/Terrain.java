@@ -34,7 +34,7 @@ public class Terrain {
      * @param seed long for randomizing the terrain height
      */
     public Terrain(GameObjectCollection gameObjects,
-                   Vector2 windowDimensions, int groundLayer,
+                   int groundLayer, Vector2 windowDimensions,
                    long seed) {
         this.gameObjects = gameObjects;
         this.groundLayer = groundLayer;

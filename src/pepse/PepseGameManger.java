@@ -39,10 +39,6 @@ public class PepseGameManger extends GameManager {
     public static final float GRAVITY = 500;
     public static final float VELOCITY_X = 300;
     public static final float VELOCITY_Y = -300;
-    private static final String PLAYER_IMAGE_STANDING = "pepse/assets/player_standing.png";
-    private static final String[] PLAYER_WALKING = new String[]{"pepse/assets/player_left.png",
-            "pepse/assets/player_right.png"};
-    private static final Vector2 PLAYER_DIMENSIONS = new Vector2(28, 49);
     private static final String ANIMAL_IMAGE_STANDING = "pepse/assets/animal1_standing.png";
     private static final String[] ANIMAL_WALKING = new String[]{"pepse/assets/animal1_left.png",
             "pepse/assets/animal1_right.png"};
@@ -171,14 +167,14 @@ public class PepseGameManger extends GameManager {
         // Init Sky
         Sky.create(this.gameObjects(), windowDimensions, Layer.BACKGROUND);
         // Init Terrain
-        terrain = new Terrain(this.gameObjects(), windowDimensions, groundLayer, SEED);
+        terrain = new Terrain(this.gameObjects(), groundLayer, windowDimensions, SEED);
         terrain.createInRange((int) -screenSize, (int) (2 * screenSize));
         // Init trees
         this.tree = new Tree(terrain, this.gameObjects(), treeLayer,liffLayer);
         InitTrees();
         // Init Avatar
         Vector2 avatarPosition = new Vector2(windowDimensions.x() * 0.5F, 0);
-        this.avatar = createAvatar(gameObjects(), avatarLayer, avatarPosition, inputListener, imageReader);
+        this.avatar = Avatar.create(gameObjects(), avatarLayer, avatarPosition, inputListener, imageReader);
 
 
         createAnimalsInRange((int) -screenSize, (int) 0, terrain, this.gameObjects(), avatarLayer, imageReader);
@@ -215,26 +211,6 @@ public class PepseGameManger extends GameManager {
         }
         catch(java.util.NoSuchElementException e){
         }
-    }
-
-    /**
-     * Helper Function the create the avatar
-     * @param gameObjects GameObjectCollection to add terrain blocks to
-     * @param layer int layer to put the avatar in
-     * @param topLeftCorner Vector2 initial position of the avatar
-     * @param inputListener UserInputListener to handle the movement of the avatar based on user input
-     * @param imageReader ImageReader for rendering the avatar's look
-     * @return the newly created avatar GameObject
-     */
-    public static Avatar createAvatar(GameObjectCollection gameObjects,
-                                      int layer, Vector2 topLeftCorner,
-                                      UserInputListener inputListener,
-                                      ImageReader imageReader) {
-        ImageRenderable avatarStanding = imageReader.readImage(PLAYER_IMAGE_STANDING, false);
-        AnimationRenderable avatarWalking = new AnimationRenderable(PLAYER_WALKING, imageReader, false, 0.25);
-        Avatar avatar = new Avatar(topLeftCorner, PLAYER_DIMENSIONS, avatarStanding, avatarWalking, inputListener);
-        gameObjects.addGameObject(avatar, layer);
-        return avatar;
     }
 
     /**

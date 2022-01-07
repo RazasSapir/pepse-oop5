@@ -1,8 +1,11 @@
 package pepse.world;
 
 import danogl.GameObject;
+import danogl.collisions.GameObjectCollection;
+import danogl.gui.ImageReader;
 import danogl.gui.UserInputListener;
 import danogl.gui.rendering.AnimationRenderable;
+import danogl.gui.rendering.ImageRenderable;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 import pepse.PepseGameManger;
@@ -24,6 +27,11 @@ public class Avatar extends GameObject {
     private double energy;
     private boolean isFlying;
 
+    private static final Vector2 PLAYER_DIMENSIONS = new Vector2(28, 49);
+    private static final String PLAYER_IMAGE_STANDING = "pepse/assets/player_standing.png";
+    private static final String[] PLAYER_WALKING = new String[]{"pepse/assets/player_left.png",
+            "pepse/assets/player_right.png"};
+
     /**
      * Constructor for the Avatar GameObject
      * @param pos Vector2 initial position
@@ -41,6 +49,26 @@ public class Avatar extends GameObject {
         this.animationRanderer = animatedRenderer;
         this.energy = INITIAL_ENERGY;
         this.isFlying = false;
+    }
+
+    /**
+     * Helper Function the create the avatar
+     * @param gameObjects GameObjectCollection to add terrain blocks to
+     * @param layer int layer to put the avatar in
+     * @param topLeftCorner Vector2 initial position of the avatar
+     * @param inputListener UserInputListener to handle the movement of the avatar based on user input
+     * @param imageReader ImageReader for rendering the avatar's look
+     * @return the newly created avatar GameObject
+     */
+    public static Avatar create(GameObjectCollection gameObjects,
+                                      int layer, Vector2 topLeftCorner,
+                                      UserInputListener inputListener,
+                                      ImageReader imageReader) {
+        ImageRenderable avatarStanding = imageReader.readImage(PLAYER_IMAGE_STANDING, false);
+        AnimationRenderable avatarWalking = new AnimationRenderable(PLAYER_WALKING, imageReader, false, 0.25);
+        Avatar avatar = new Avatar(topLeftCorner, PLAYER_DIMENSIONS, avatarStanding, avatarWalking, inputListener);
+        gameObjects.addGameObject(avatar, layer);
+        return avatar;
     }
 
     /**
