@@ -25,6 +25,7 @@ import pepse.world.daynight.SunHalo;
 import pepse.world.trees.Leaf;
 import pepse.world.trees.Tree;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
@@ -54,8 +55,9 @@ public class PepseGameManger extends GameManager {
     private static final int avatarLayer = Layer.DEFAULT;
     private static final int MAX_ANIMALS_IN_RANGE = 3;
     private static final int SAFETY_GAP = 200;
-    private static final int Y_GAP = 150;
     private static final Vector2 ANIMAL_DIMENSIONS =  new Vector2(Block.SIZE, Block.SIZE);
+    private static final Color BASIC_SUN_HALO_COLOR = new Color(255, 255, 0, 20);
+
 
 
 
@@ -197,7 +199,7 @@ public class PepseGameManger extends GameManager {
         // Init night, sun and sun halo
         Night.create(this.gameObjects(), Layer.FOREGROUND, windowController.getWindowDimensions(), DAY_LENGTH);
         GameObject sun = Sun.create(this.gameObjects(), Layer.BACKGROUND, windowController.getWindowDimensions(), DAY_LENGTH);
-        SunHalo.create(this.gameObjects(), Layer.BACKGROUND + 1, sun);
+        SunHalo.create(this.gameObjects(), Layer.BACKGROUND + 1, sun, BASIC_SUN_HALO_COLOR);
     }
 
     /**
