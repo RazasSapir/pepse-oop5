@@ -71,6 +71,7 @@ public class PepseGameManger extends GameManager {
     private EnergyDisplay energyDisplay;
     public static final int DAY_LENGTH = 30;
     private boolean createdCollision = false;
+    private Tree tree;
 
     /**
      * Constructor for the PepseGameManger
@@ -105,8 +106,7 @@ public class PepseGameManger extends GameManager {
             currentScreen -= 1;
             updateBoundaries();
             terrain.createInRange((int) farLeftBoundary, (int) leftBoundary);
-            needToCreateCollision = Tree.createInRange((int) farLeftBoundary, (int) leftBoundary, terrain, this.gameObjects(),
-                    treeLayer, liffLayer);
+            this.tree.createInRange((int) farLeftBoundary, (int) leftBoundary);
             // remove irrelevant objects
             createAnimalsInRange((int)farLeftBoundary, (int) leftBoundary, terrain, this.gameObjects(), avatarLayer, this.imageReader);
             removeObjectsByCondition(g -> g.getTopLeftCorner().x() > roundToBlock(farRightBoundary));
@@ -115,8 +115,7 @@ public class PepseGameManger extends GameManager {
             currentScreen += 1;
             updateBoundaries();
             terrain.createInRange((int) rightBoundary, (int) farRightBoundary);
-            needToCreateCollision = Tree.createInRange((int) rightBoundary, (int) farRightBoundary, terrain, this.gameObjects(),
-                    treeLayer, liffLayer);
+            this.tree.createInRange((int) rightBoundary, (int) farRightBoundary);
 
             // remove the trees and irrelevant terrain
             createAnimalsInRange((int)rightBoundary, (int) farRightBoundary, terrain, this.gameObjects(), avatarLayer, this.imageReader);
@@ -124,9 +123,13 @@ public class PepseGameManger extends GameManager {
             removeObjectsByCondition(g -> g.getTopLeftCorner().x() < roundToBlock(farLeftBoundary));
         }
         if (!createdCollision && needToCreateCollision) {
-            gameObjects().layers().shouldLayersCollide(liffLayer, groundLayer, true);
-            gameObjects().layers().shouldLayersCollide(treeLayer, avatarLayer, true);
-            createdCollision = true;
+            try{
+                gameObjects().layers().shouldLayersCollide(liffLayer, groundLayer, true);
+                gameObjects().layers().shouldLayersCollide(treeLayer, avatarLayer, true);
+                createdCollision = true;
+            }
+            catch(java.util.NoSuchElementException e){
+            }
         }
     }
 
@@ -171,6 +174,7 @@ public class PepseGameManger extends GameManager {
         terrain = new Terrain(this.gameObjects(), windowDimensions, groundLayer, SEED);
         terrain.createInRange((int) -screenSize, (int) (2 * screenSize));
         // Init trees
+        this.tree = new Tree(terrain, this.gameObjects(), treeLayer,liffLayer);
         InitTrees();
         // Init Avatar
         Vector2 avatarPosition = new Vector2(windowDimensions.x() * 0.5F, 0);
@@ -200,17 +204,16 @@ public class PepseGameManger extends GameManager {
      * Helper function to initialize the trees
      */
     private void InitTrees() {
-        boolean isLeavesInScreen1 = Tree.createInRange((int) -screenSize, 0, terrain, this.gameObjects(), treeLayer,
-                liffLayer);
-        boolean isLeavesInScreen2 = Tree.createInRange(0, (int) screenSize, terrain, this.gameObjects(), treeLayer,
-                liffLayer);
-        boolean isLeavesInScreen3 = Tree.createInRange((int) screenSize, (int) (2 * screenSize), terrain, this.gameObjects(), treeLayer,
-                liffLayer);
+        this.tree.createInRange((int) -screenSize, 0);
+        this.tree.createInRange(0, (int) screenSize);
+        this.tree.createInRange((int) screenSize, (int) (2 * screenSize));
         // Create collision between the layers only if they're aren't empty
-        if (isLeavesInScreen1 || isLeavesInScreen2 || isLeavesInScreen3) {
+        try{
             gameObjects().layers().shouldLayersCollide(liffLayer, groundLayer, true);
             gameObjects().layers().shouldLayersCollide(treeLayer, avatarLayer, true);
             createdCollision = true;
+        }
+        catch(java.util.NoSuchElementException e){
         }
     }
 

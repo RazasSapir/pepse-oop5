@@ -19,6 +19,26 @@ public class Tree {
     public static final Color BASE_TREE_COLOR = new Color(100, 50, 20);
     public static final Color BASE_LEAF_COLOR = new Color(50, 200, 30);
 
+    private Terrain terrain;
+    private GameObjectCollection gameObjects;
+    private int layer;
+    private int leavesLayer;
+
+    /**
+     * constructor for the Tree object.
+     * @param terrain the terrain of the game's world.
+     * @param gameObjects the list of game objects in the game.
+     * @param layer the layer the trees are created in.
+     * @param leavesLayer the layer the leaves are created in.
+     */
+    public Tree(Terrain terrain, GameObjectCollection gameObjects, int layer,
+                 int leavesLayer)
+    {
+        this.terrain = terrain;
+        this.gameObjects = gameObjects;
+        this.layer = layer;
+        this.leavesLayer = leavesLayer;
+    }
 
     /**
      * Creates a tree in given location and height
@@ -60,14 +80,8 @@ public class Tree {
      * Creates Trees in the given range
      * @param minX int minimum x value
      * @param maxX int maximum x value
-     * @param terrain Terrain Object
-     * @param gameObjects Collection of the game's objects
-     * @param layer int layer to add the tree object to.
-     * @param leavesLayer int layer to add the leaves layer
-     * @return return if the leaves were created to allow collisions between them and the ground.
      */
-    public static boolean createInRange(int minX, int maxX, Terrain terrain, GameObjectCollection gameObjects, int layer,
-                                     int leavesLayer) {
+    public void createInRange(int minX, int maxX) {
         // create random values in the wanted range
         minX = (int) (Math.floor((float) minX / Block.SIZE) + 1) * Block.SIZE;
         maxX = (int) (Math.floor((float) maxX / Block.SIZE) + 1) * Block.SIZE;
@@ -80,15 +94,14 @@ public class Tree {
                 // determine tree height
                 int curr_height = (Math.abs(value_number.nextInt()) % (MAXHEIGHT - MINHEIGHT + 1)) + MINHEIGHT;
                 //create a new tree if necessary
-                double height = Math.floor(terrain.groundHeightAt((float) curr_value / Block.SIZE) / Block.SIZE) * Block.SIZE;
+                double height = Math.floor(this.terrain.groundHeightAt((float) curr_value / Block.SIZE) / Block.SIZE) * Block.SIZE;
                 int roundedHeight = Math.max((int) (height - (height % Block.SIZE)), 0);
                 createTree(new Vector2(curr_value, roundedHeight),
-                        curr_height, gameObjects, layer);
+                        curr_height, this.gameObjects, layer);
                 createLeafCollection(new Vector2(curr_value, roundedHeight - Block.SIZE * curr_height),
                         curr_height, gameObjects, leavesLayer);
                 createdLeaves = true;
             }
         }
-        return createdLeaves;
     }
 }
