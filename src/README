@@ -4,10 +4,8 @@ arile 324955756
 
 Differences between UML diagrams:
 
-    There weren't major changes between the UML diagrams.
-
-
-
+    There weren't major changes between the UML diagrams. The main changes were the the class "avatar" doesn't extend
+    "animal", and these are completely separate classes.
 
 explanation on how we made the world endless:
 
