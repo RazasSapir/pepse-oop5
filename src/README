@@ -17,6 +17,7 @@ Differences between UML diagrams:
         * full line with a rhombus at the beginning - owns.
 
 
+
 explanation on how we made the world endless:
 
     We made the game world endless by managing only 3 screens at a time - the current screen the avatar is in,
