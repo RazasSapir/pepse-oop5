@@ -12,6 +12,7 @@ import danogl.gui.rendering.AnimationRenderable;
 import danogl.gui.rendering.Camera;
 import danogl.gui.rendering.ImageRenderable;
 import danogl.util.Vector2;
+import pepse.util.Animal;
 import pepse.util.EnergyDisplay;
 import pepse.world.Avatar;
 import pepse.world.Block;
@@ -37,6 +38,9 @@ public class PepseGameManger extends GameManager {
     private static final String PLAYER_IMAGE_STANDING = "assets/player_standing.png";
     private static final String[] PLAYER_WALKING = new String[]{"assets/player_left.png",
             "assets/player_right.png"};
+    private static final String ANIMAL_IMAGE_STANDING = "assets/animal1_standing.png";
+    private static final String[] ANIMAL_WALKING = new String[]{"assets/animal1_left.png",
+            "assets/animal1_right.png"};
     private static final Vector2 PLAYER_DIMENSIONS = new Vector2(28, 50);
     private static final float PADDING = 5;
     private static final float TEXT_SIZE = 30;
@@ -44,9 +48,15 @@ public class PepseGameManger extends GameManager {
     private static final int groundLayer = Layer.STATIC_OBJECTS;
     private static final int liffLayer = Layer.STATIC_OBJECTS + 2;
     private static final int avatarLayer = Layer.DEFAULT;
+    private static final int MAX_ANIMALS_IN_RANGE = 3;
+    private static final int SAFETY_GAP = 200;
+    private static final int Y_GAP = 150;
+    private static final Vector2 ANIMAL_DIMENSIONS =  new Vector2(Block.SIZE, Block.SIZE);
+
 
 
     private UserInputListener inputListener;
+    private ImageReader imageReader;
     private Terrain terrain;
     private Vector2 windowDimensions;
     private int currentScreen;
@@ -87,6 +97,7 @@ public class PepseGameManger extends GameManager {
             terrain.createInRange((int) farLeftBoundary, (int) leftBoundary);
             needToCreateCollision = Tree.createInRange((int) farLeftBoundary, (int) leftBoundary, terrain, this.gameObjects(),
                     treeLayer, liffLayer);
+            createAnimalsInRange((int)farLeftBoundary, (int) leftBoundary, terrain, this.gameObjects(), avatarLayer, this.imageReader);
             removeObjectsByCondition(g -> g.getTopLeftCorner().x() > roundToBlock(farRightBoundary));
         }
         else if (avatar.getCenter().x() > (currentScreen + 1) * screenSize){
@@ -97,6 +108,7 @@ public class PepseGameManger extends GameManager {
                     treeLayer, liffLayer);
 
             // remove the trees and irrelevant terrain
+            createAnimalsInRange((int)rightBoundary, (int) farRightBoundary, terrain, this.gameObjects(), avatarLayer, this.imageReader);
             removeObjectsByCondition(g -> g.getTopLeftCorner().x() < roundToBlock(farLeftBoundary));
         }
         if(!createdCollision && needToCreateCollision){
@@ -129,6 +141,7 @@ public class PepseGameManger extends GameManager {
         this.currentScreen = 0;
         this.windowDimensions = windowController.getWindowDimensions();
         this.screenSize = windowDimensions.x();
+        this.imageReader = imageReader;
         Sky.create(this.gameObjects(), windowDimensions, Layer.BACKGROUND);
         terrain = new Terrain(this.gameObjects(), windowDimensions, groundLayer, SEED);
         terrain.createInRange((int) -screenSize, (int) (2 * screenSize));
@@ -151,6 +164,12 @@ public class PepseGameManger extends GameManager {
             createdCollision = true;
         }
 
+        createAnimalsInRange((int) -screenSize, (int) 0, terrain, this.gameObjects(), avatarLayer, imageReader);
+        createAnimalsInRange((int) 0, (int) screenSize, terrain, this.gameObjects(), avatarLayer, imageReader);
+        createAnimalsInRange((int) screenSize, (int)(2 * screenSize), terrain, this.gameObjects(), avatarLayer, imageReader);
+
+
+
         setCamera(new Camera(avatar, Vector2.ZERO,
                 windowController.getWindowDimensions(), windowController.getWindowDimensions()));
         this.energyDisplay = new EnergyDisplay(
@@ -171,6 +190,22 @@ public class PepseGameManger extends GameManager {
         Avatar avatar = new Avatar(topLeftCorner, PLAYER_DIMENSIONS, avatarStanding, avatarWalking, inputListener);
         gameObjects.addGameObject(avatar, layer);
         return avatar;
+    }
+
+    public static void createAnimalsInRange(int minX, int maxX, Terrain terrain, GameObjectCollection gameObjects, int layer,
+                                                ImageReader imageReader){
+        int curr_animals_number = (int)(Math.random() * MAX_ANIMALS_IN_RANGE);
+        ImageRenderable animalStanding = imageReader.readImage(ANIMAL_IMAGE_STANDING, false);
+        AnimationRenderable animalWalking = new AnimationRenderable(ANIMAL_WALKING, imageReader, false, 0.25);
+        for(int counter = 0; curr_animals_number > counter; counter++)
+        {
+            int curr_X = (int)(Math.random() * (maxX - minX - SAFETY_GAP + 1) + minX + SAFETY_GAP);
+            double height = Math.floor(terrain.groundHeightAt((float) curr_X / Block.SIZE) / Block.SIZE) * Block.SIZE;
+            float roundedHeight = Math.max((int) (height - (height % Block.SIZE)), 0);
+            gameObjects.addGameObject(new Animal(new Vector2(curr_X, (float)(roundedHeight - ANIMAL_DIMENSIONS.y())),
+                    ANIMAL_DIMENSIONS, animalStanding, animalWalking, SEED, minX, maxX), layer);
+        }
+
     }
 
     public static int roundToBlock(float x){
