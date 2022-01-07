@@ -7,7 +7,6 @@ import danogl.components.Transition;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 
-import java.awt.*;
 
 public class Leaf extends GameObject {
     public static final int LEAF_MAX_LIFE_TIME = 40;
@@ -19,11 +18,11 @@ public class Leaf extends GameObject {
     public static final int MAX_DEATH_TIME = 25;
     private boolean onReturn = false;
     private boolean onSmaller = true;
-    private float initWidth = 0;
-    private float currLifeTime = 0;
-    private Transition movementTransition;
-    private float currDeathTime = 0;
-    private Vector2 initPos;
+    private final float initWidth;
+    private float currLifeTime;
+    private Transition<Float> movementTransition;
+    private float currDeathTime;  //todo: no one uses this field
+    private final Vector2 initPos;
     private ScheduledTask alterAngle;
     private ScheduledTask alterSize;
     private ScheduledTask alterDive;
@@ -31,7 +30,7 @@ public class Leaf extends GameObject {
 
 
     /**
-     * Construct a new GameObject instance.
+     * Construct a new Leaf instance.
      *
      * @param topLeftCorner Position of the object, in window coordinates (pixels).
      *                      Note that (0,0) is the top-left corner of the window.
@@ -45,23 +44,27 @@ public class Leaf extends GameObject {
         this.currLifeTime = (float) Math.random() * LEAF_MAX_LIFE_TIME;
         this.currDeathTime = (float) Math.random() * MAX_DEATH_TIME;
 
-
         // declare two transitions
-        this.initProgram();
+        this.initLeafScheduledTasks();
     }
 
-    private void initProgram() {
+    /**
+     * Inits the scheduled tasks of the leafs.
+     */
+    private void initLeafScheduledTasks() {
         this.transform().setVelocity(Vector2.ZERO);
 
         alterAngle = new ScheduledTask(
                 this, (float) (Math.random() * 3f), true, this::alterAngle);
-
         alterSize = new ScheduledTask(this, (float) (Math.random() * 3f), true, this::alterWidth);
         // declare the dropout phase
         alterDive = new ScheduledTask(
                 this, currLifeTime, true, this::diveDown);
     }
 
+    /**
+     * Function for the schedule task to alter the angle of the leaves.
+     */
     private void alterAngle() {
         if (onReturn) {
             this.renderer().setRenderableAngle(this.renderer().getRenderableAngle() -
@@ -78,6 +81,9 @@ public class Leaf extends GameObject {
         }
     }
 
+    /**
+     * Function for the schedule task to alter the width of the leaves.
+     */
     private void alterWidth() {
         if (onSmaller) {
             this.setDimensions(new Vector2(this.getDimensions().x(), this.getDimensions().x() - 2f));
@@ -92,25 +98,36 @@ public class Leaf extends GameObject {
         }
     }
 
+    /**
+     * Restarts the position of the current tree.
+     */
     private void restartLeaf() {
-        // restart position of the current leaf
+        new ScheduledTask(this, currDeathTime, false,
+                this::restartLife);
+    }
+
+    /**
+     * helper function to restart life
+     */
+    private void restartLife()
+    {
         deathMode = false;
         this.setTopLeftCorner(initPos);
         this.renderer().setOpaqueness(1f);
         this.currLifeTime = (float) Math.random() * LEAF_MAX_LIFE_TIME;
         this.currDeathTime = (float) Math.random() * MAX_DEATH_TIME;
-        this.initProgram();
+        this.initLeafScheduledTasks();
     }
 
+    /**
+     * Function for the schedule task to alter the fall of the leaves.
+     */
     private void diveDown() {
-        this.renderer().fadeOut(FADE_OUT_TIME, () -> {
-            this.restartLeaf();
-        });
+        this.renderer().fadeOut(FADE_OUT_TIME, this::restartLeaf); // fall and then restart
 
-        //alter the velocity and dive down
         this.transform().setVelocityY(Y_VELOCITY_LEAF);
         movementTransition =
-                new Transition<Float>(
+                new Transition<>(
                         this, // the game object being changed
                         this.transform()::setVelocityX, // the method to call
                         (float) MAX_VELOCITY_X_LEAF, // initial transition value
@@ -121,6 +138,11 @@ public class Leaf extends GameObject {
                         null); // nothing further to execute upon reaching final value
     }
 
+    /**
+     * Handles the collisions of the leaf with other GameObjects
+     * @param other GameObject other
+     * @param collision Collision Object
+     */
     @Override
     public void onCollisionEnter(GameObject other, Collision collision) {
         super.onCollisionEnter(other, collision);
@@ -133,6 +155,10 @@ public class Leaf extends GameObject {
         deathMode = true;
     }
 
+    /**
+     * Updates the leaf's velocity if dead
+     * @param deltaTime time between frames.
+     */
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);

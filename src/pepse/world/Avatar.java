@@ -18,6 +18,14 @@ public class Avatar extends GameObject {
     private double energy;
     private boolean isFlying;
 
+    /**
+     * Constructor for the Avatar GameObject
+     * @param pos Vector2 initial position
+     * @param size Vector2 Object's size
+     * @param avatarStandingRenderer Renderer for the avatar while standing
+     * @param animatedRenderer Renderer for the avatar while walking
+     * @param inputListener InputLister the handle the avatar's movements.
+     */
     public Avatar(Vector2 pos, Vector2 size, Renderable avatarStandingRenderer, AnimationRenderable animatedRenderer, UserInputListener inputListener) {
         super(pos, size, avatarStandingRenderer);
         physics().preventIntersectionsFromDirection(Vector2.ZERO);
@@ -29,6 +37,10 @@ public class Avatar extends GameObject {
         this.isFlying = false;
     }
 
+    /**
+     * Updates the avatar's location based on userInput
+     * @param deltaTime time between frames
+     */
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
@@ -52,11 +64,18 @@ public class Avatar extends GameObject {
         }
     }
 
+    /**
+     * @return Energy level of the avatar
+     */
     public double getEnergy(){
         return energy;
     }
 
+    /**
+     * Handles the direction and type of the render based on the direction of the avatar.
+     */
     private void handle_renderer() {
+        // Handle flying mode
         if (isFlying) {
             renderer().setRenderableAngle(-90);
             renderer().setRenderable(imageStandingRenderer);
@@ -65,6 +84,7 @@ public class Avatar extends GameObject {
             renderer().setRenderableAngle(0);
             renderer().setRenderable(animationRanderer);
         }
+        // Handle Walking mode
         if (getVelocity().x() == 0){
             renderer().setRenderable(imageStandingRenderer);
         }

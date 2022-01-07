@@ -21,9 +21,16 @@ public class Terrain {
     private static final Color BASE_GROUND_COLOR = new Color(212, 123, 74);
 
 
+    /**
+     * Constructor for the terrain Handler
+     * @param gameObjects GameObjectCollection to add terrain blocks to
+     * @param windowDimensions Vector2 size of the window
+     * @param groundLayer int the layer in which terrain blocks should be positioned.
+     * @param seed long for randomizing the terrain height
+     */
     public Terrain(GameObjectCollection gameObjects,
                    Vector2 windowDimensions, int groundLayer,
-                   int seed) {
+                   long seed) {
         this.gameObjects = gameObjects;
         this.groundLayer = groundLayer;
         this.groundHeightAtX0 = windowDimensions.y() * 2 / 3;
@@ -31,17 +38,26 @@ public class Terrain {
         this.NoiseGenerator = new NoiseGenerator(seed);
     }
 
+    /**
+     * @param x float value to check the ground's height at
+     * @return height of the ground at position x - not rounded to block's size
+     */
     public double groundHeightAt(float x) {
         return groundHeightAtX0 + groundDeltaFactor * this.NoiseGenerator.noise(x);
     }
 
+    /**
+     * Creates Terrain in the given range
+     * @param minX int minimum x value
+     * @param maxX int maximum x value
+     */
     public void createInRange(int minX, int maxX) {
         minX = (int) (Math.floor((float) minX / Block.SIZE) + 1) * Block.SIZE;
         maxX = (int) (Math.floor((float) maxX / Block.SIZE) + 1) * Block.SIZE;
-        int counter = 0;
         for (int i = minX; i < maxX; i += Block.SIZE) {
             double height = Math.floor(groundHeightAt((float) i / Block.SIZE) / Block.SIZE) * Block.SIZE;
             int roundedHeight = Math.max((int) (height - (height % Block.SIZE)), 0); // Make sure there is at least one block
+            // Add terrain colum
             for (int j = 0; j < TERRAIN_DEPTH; j++) {
                 RectangleRenderable groundBlockRenderer = new RectangleRenderable(ColorSupplier.approximateColor(BASE_GROUND_COLOR));
                 Block block = new Block(new Vector2(i, roundedHeight + j * Block.SIZE), groundBlockRenderer);
@@ -50,7 +66,6 @@ public class Terrain {
                 else
                     this.gameObjects.addGameObject(block, Layer.BACKGROUND + 10);
                 block.setTag(GROUND_BLOCK);
-                counter += 1;
             }
         }
     }
