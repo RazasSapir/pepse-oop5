@@ -32,6 +32,9 @@ public class EnergyDisplay {
         this.textRenderable = energyTextRenderer;
     }
 
+    /**
+     * @return GameObject of the Energy Text.
+     */
     public GameObject getEnergyText(){
         return energyText;
     }

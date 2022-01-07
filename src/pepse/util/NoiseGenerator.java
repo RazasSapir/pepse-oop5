@@ -1,9 +1,15 @@
 package pepse.util;
 
 /**
- * This is code was taken from https://gist.github.com/alksily/7a85a1898e65c936f861ee93516e397d
- * and adapted for our needs. It was not written by us and is used for educational purposes only.
+ * **************************************************************************************************
+ *                                                                                                  *
+ *   ACKNOWLEDGEMENT                                                                                *
+ *   This is code was taken from https://gist.github.com/alksily/7a85a1898e65c936f861ee93516e397d   *
+ *   and adapted for our needs. It was not written by us and is used for educational purposes only. *
+ *                                                                                                  *
+ * **************************************************************************************************
  */
+
 public class NoiseGenerator {
     private final double seed;
     private long default_size;

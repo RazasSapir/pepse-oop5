@@ -20,18 +20,24 @@ public class Animal extends GameObject {
      * @param topLeftCorner Position of the object, in window coordinates (pixels).
      *                      Note that (0,0) is the top-left corner of the window.
      * @param dimensions    Width and height in window coordinates.
-     * @param avatarStandingRenderer    The renderable representing the object. Can be null, in which case
+     * @param animalStandingRenderer A renderer representing the animal when standign
+     * @param animatedRenderer An animation renderer for animal
+     * @param seed a seed for the randomizer object.
      */
-    public Animal(Vector2 topLeftCorner, Vector2 dimensions, Renderable avatarStandingRenderer, AnimationRenderable animatedRenderer, long seed) {
-        super(topLeftCorner, dimensions, avatarStandingRenderer);
+    public Animal(Vector2 topLeftCorner, Vector2 dimensions, Renderable animalStandingRenderer, AnimationRenderable animatedRenderer, long seed) {
+        super(topLeftCorner, dimensions, animalStandingRenderer);
         physics().preventIntersectionsFromDirection(Vector2.ZERO);
         transform().setAccelerationY(PepseGameManger.GRAVITY);
-        this.imageStandingRenderer = avatarStandingRenderer;
+        this.imageStandingRenderer = animalStandingRenderer;
         this.randomizer = new Random(seed);
         this.animationRenderer = animatedRenderer;
         this.xVel = 0;
     }
 
+    /**
+     * Updated the movement of the animal
+     * @param deltaTime time between frames.
+     */
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
@@ -50,17 +56,9 @@ public class Animal extends GameObject {
         handle_renderer();
     }
 
-
-
-
-
-
-
-
-
-
-
-
+    /**
+     * Handles the direction and type of the render based on the direction of the animal.
+     */
     private void handle_renderer() {
         if (getVelocity().x() == 0){
             renderer().setRenderable(imageStandingRenderer);

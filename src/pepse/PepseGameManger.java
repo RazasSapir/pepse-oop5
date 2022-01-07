@@ -13,6 +13,7 @@ import danogl.gui.rendering.Camera;
 import danogl.gui.rendering.ImageRenderable;
 import danogl.util.Vector2;
 import pepse.util.EnergyDisplay;
+import pepse.util.Animal;
 import pepse.world.Avatar;
 import pepse.world.Block;
 import pepse.world.Sky;
@@ -22,8 +23,6 @@ import pepse.world.daynight.Sun;
 import pepse.world.daynight.SunHalo;
 import pepse.world.trees.Leaf;
 import pepse.world.trees.Tree;
-
-import java.awt.*;
 
 import java.util.ArrayList;
 import java.util.function.Predicate;
@@ -37,7 +36,7 @@ public class PepseGameManger extends GameManager {
     private static final String PLAYER_IMAGE_STANDING = "assets/player_standing.png";
     private static final String[] PLAYER_WALKING = new String[]{"assets/player_left.png",
             "assets/player_right.png"};
-    private static final Vector2 PLAYER_DIMENSIONS = new Vector2(28, 50);
+    private static final Vector2 PLAYER_DIMENSIONS = new Vector2(28, 49);
     private static final float PADDING = 5;
     private static final float TEXT_SIZE = 30;
     private static final int treeLayer = Layer.STATIC_OBJECTS + 1;
@@ -46,9 +45,7 @@ public class PepseGameManger extends GameManager {
     private static final int avatarLayer = Layer.DEFAULT;
 
 
-    private UserInputListener inputListener;
     private Terrain terrain;
-    private Vector2 windowDimensions;
     private int currentScreen;
     private Avatar avatar;
     private float screenSize;
@@ -58,58 +55,71 @@ public class PepseGameManger extends GameManager {
     private float farRightBoundary;
     private EnergyDisplay energyDisplay;
     public static final int DAY_LENGTH = 30;
-    private static final Color BASIC_SUN_HALO_COLOR = new Color(255, 255, 0, 20);
     private boolean createdCollision = false;
 
-
-    public PepseGameManger() {
-
-    }
-
+    /**
+     * Constructor for the PepseGameManger
+     *
+     * @param windowTitle      String title of the window
+     * @param windowDimensions Vector2 Size of the wanted Game Window
+     */
     public PepseGameManger(String windowTitle, Vector2 windowDimensions) {
         super(windowTitle, windowDimensions);
     }
 
-    private void updateBoundaries(){
+    /**
+     * Updates the boundaries of the screen based on the currentScreen field
+     */
+    private void updateBoundaries() {
         farLeftBoundary = (int) ((currentScreen - 1) * screenSize);
         leftBoundary = (int) ((currentScreen) * screenSize);
         rightBoundary = (int) ((currentScreen + 1) * screenSize);
-        farRightBoundary = (int) ((currentScreen + 2) * screenSize);}
+        farRightBoundary = (int) ((currentScreen + 2) * screenSize);
+    }
 
+    /**
+     * Updates the games based on the position's of the avatar
+     *
+     * @param deltaTime time between frames
+     */
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
         boolean needToCreateCollision = false;
         energyDisplay.update();
-        if (avatar.getCenter().x() < currentScreen * screenSize){
+        if (avatar.getCenter().x() < currentScreen * screenSize) {
             currentScreen -= 1;
             updateBoundaries();
             terrain.createInRange((int) farLeftBoundary, (int) leftBoundary);
             needToCreateCollision = Tree.createInRange((int) farLeftBoundary, (int) leftBoundary, terrain, this.gameObjects(),
                     treeLayer, liffLayer);
+            // remove irrelevant objects
             removeObjectsByCondition(g -> g.getTopLeftCorner().x() > roundToBlock(farRightBoundary));
-        }
-        else if (avatar.getCenter().x() > (currentScreen + 1) * screenSize){
+        } else if (avatar.getCenter().x() > (currentScreen + 1) * screenSize) {
             currentScreen += 1;
             updateBoundaries();
             terrain.createInRange((int) rightBoundary, (int) farRightBoundary);
             needToCreateCollision = Tree.createInRange((int) rightBoundary, (int) farRightBoundary, terrain, this.gameObjects(),
                     treeLayer, liffLayer);
-
-            // remove the trees and irrelevant terrain
+            // remove irrelevant objects
             removeObjectsByCondition(g -> g.getTopLeftCorner().x() < roundToBlock(farLeftBoundary));
         }
-        if(!createdCollision && needToCreateCollision){
+        if (!createdCollision && needToCreateCollision) {
             gameObjects().layers().shouldLayersCollide(liffLayer, groundLayer, true);
             gameObjects().layers().shouldLayersCollide(treeLayer, avatarLayer, true);
             createdCollision = true;
         }
     }
 
+    /**
+     * Helper function to remove the objects far away from the player
+     *
+     * @param condition Predicate<GameObject> the check if the given GameObject should be deleted
+     */
     private void removeObjectsByCondition(Predicate<GameObject> condition) {
         ArrayList<GameObject> tempToRemove = new ArrayList<>();
         for (GameObject g : gameObjects()) {
-            if (condition.test(g) && (g instanceof Block || g instanceof Leaf)) {
+            if (condition.test(g) && (g instanceof Block || g instanceof Leaf || g instanceof Animal)) {
                 tempToRemove.add(g);
             }
         }
@@ -121,51 +131,75 @@ public class PepseGameManger extends GameManager {
         }
     }
 
+    /**
+     * Override initializeGame - inits the different objects
+     *
+     * @param imageReader      ImageReader for rendering Images
+     * @param soundReader      SoundReader for rendering sound
+     * @param inputListener    UserInputListener to handle user's input
+     * @param windowController WindowController to control the game's window
+     */
     @Override
     public void initializeGame(ImageReader imageReader, SoundReader soundReader, UserInputListener inputListener,
                                WindowController windowController) {
         super.initializeGame(imageReader, soundReader, inputListener, windowController);
-        this.inputListener = inputListener;
         this.currentScreen = 0;
-        this.windowDimensions = windowController.getWindowDimensions();
+        Vector2 windowDimensions = windowController.getWindowDimensions();
         this.screenSize = windowDimensions.x();
+        // Init Sky
         Sky.create(this.gameObjects(), windowDimensions, Layer.BACKGROUND);
+        // Init Terrain
         terrain = new Terrain(this.gameObjects(), windowDimensions, groundLayer, SEED);
         terrain.createInRange((int) -screenSize, (int) (2 * screenSize));
-
-        boolean create1 = Tree.createInRange((int) -screenSize, (int) 0, terrain, this.gameObjects(), treeLayer,
-                liffLayer);
-        boolean create2 = Tree.createInRange((int) 0, (int) screenSize, terrain, this.gameObjects(), treeLayer,
-                liffLayer);
-        boolean create3 = Tree.createInRange((int) screenSize, (int)(2 * screenSize), terrain, this.gameObjects(), treeLayer,
-                liffLayer);
-
-
+        // Init trees
+        InitTrees();
+        // Init Avatar
         Vector2 avatarPosition = new Vector2(windowDimensions.x() * 0.5F, 0);
         this.avatar = createAvatar(gameObjects(), avatarLayer, avatarPosition, inputListener, imageReader);
+        setCamera(new Camera(avatar, Vector2.ZERO,
+                windowController.getWindowDimensions(), windowController.getWindowDimensions()));
+        // Init Energy Display
+        this.energyDisplay = new EnergyDisplay(
+                new Vector2(PADDING, PADDING),
+                new Vector2(TEXT_SIZE, TEXT_SIZE), avatar::getEnergy);
+        gameObjects().addGameObject(energyDisplay.getEnergyText(), Layer.BACKGROUND + 20);
+        // Init night, sun and sun halo
+        Night.create(this.gameObjects(), Layer.FOREGROUND, windowController.getWindowDimensions(), DAY_LENGTH);
+        GameObject sun = Sun.create(this.gameObjects(), Layer.BACKGROUND, windowController.getWindowDimensions(), DAY_LENGTH);
+        SunHalo.create(this.gameObjects(), Layer.BACKGROUND + 1, sun);
+    }
 
-        // create collision between the layers only if they're aren't empty
-        if(create1 || create2 || create3){
+    /**
+     * Helper function to initialize the trees
+     */
+    private void InitTrees() {
+        boolean isLeavesInScreen1 = Tree.createInRange((int) -screenSize, 0, terrain, this.gameObjects(), treeLayer,
+                liffLayer);
+        boolean isLeavesInScreen2 = Tree.createInRange(0, (int) screenSize, terrain, this.gameObjects(), treeLayer,
+                liffLayer);
+        boolean isLeavesInScreen3 = Tree.createInRange((int) screenSize, (int) (2 * screenSize), terrain, this.gameObjects(), treeLayer,
+                liffLayer);
+        // Create collision between the layers only if they're aren't empty
+        if (isLeavesInScreen1 || isLeavesInScreen2 || isLeavesInScreen3) {
             gameObjects().layers().shouldLayersCollide(liffLayer, groundLayer, true);
             gameObjects().layers().shouldLayersCollide(treeLayer, avatarLayer, true);
             createdCollision = true;
         }
-
-        setCamera(new Camera(avatar, Vector2.ZERO,
-                windowController.getWindowDimensions(), windowController.getWindowDimensions()));
-        this.energyDisplay = new EnergyDisplay(
-                new Vector2(PADDING, PADDING),
-                new Vector2(TEXT_SIZE, TEXT_SIZE), () -> avatar.getEnergy());
-        gameObjects().addGameObject(energyDisplay.getEnergyText(), Layer.BACKGROUND);
-        Night.create(this.gameObjects(), Layer.FOREGROUND, windowController.getWindowDimensions(), DAY_LENGTH);
-        GameObject sun = Sun.create(this.gameObjects(), Layer.BACKGROUND, windowController.getWindowDimensions(), DAY_LENGTH);
-        SunHalo.create(this.gameObjects(), Layer.BACKGROUND + 1, sun, BASIC_SUN_HALO_COLOR);
     }
 
+    /**
+     * Helper Function the create the avatar
+     * @param gameObjects GameObjectCollection to add terrain blocks to
+     * @param layer int layer to put the avatar in
+     * @param topLeftCorner Vector2 initial position of the avatar
+     * @param inputListener UserInputListener to handle the movement of the avatar based on user input
+     * @param imageReader ImageReader for rendering the avatar's look
+     * @return the newly created avatar GameObject
+     */
     public static Avatar createAvatar(GameObjectCollection gameObjects,
                                       int layer, Vector2 topLeftCorner,
                                       UserInputListener inputListener,
-                                      ImageReader imageReader){
+                                      ImageReader imageReader) {
         ImageRenderable avatarStanding = imageReader.readImage(PLAYER_IMAGE_STANDING, false);
         AnimationRenderable avatarWalking = new AnimationRenderable(PLAYER_WALKING, imageReader, false, 0.25);
         Avatar avatar = new Avatar(topLeftCorner, PLAYER_DIMENSIONS, avatarStanding, avatarWalking, inputListener);
@@ -173,7 +207,17 @@ public class PepseGameManger extends GameManager {
         return avatar;
     }
 
-    public static int roundToBlock(float x){
+
+    public static void createAnimalsInRange() {
+
+    }
+
+    /**
+     * Helper function to round x value to Block.SIZE
+     * @param x float value to round
+     * @return rounder int value
+     */
+    public static int roundToBlock(float x) {
         return (int) (Math.floor(x / Block.SIZE) + 1) * Block.SIZE;
     }
 }

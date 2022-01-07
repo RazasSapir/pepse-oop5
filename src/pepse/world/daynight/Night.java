@@ -16,6 +16,14 @@ public class Night {
     private static final Float MIDNIGHT_OPACITY = 0.5f;
 
 
+    /**
+     * create a Night GameObject - A black screen with fading in and out animations.
+     * @param gameObjects Collection of the game's objects
+     * @param layer int layer to add the Night object to. Should probably be Layer.FOREGROUND.
+     * @param windowDimensions Vector2 size of the window
+     * @param cycleLength float time length of a full day.
+     * @return GameObject of the created Night Object.
+     */
     public static GameObject create(
             GameObjectCollection gameObjects,
             int layer,
@@ -31,7 +39,7 @@ public class Night {
                 0f, // initial transition value
                 MIDNIGHT_OPACITY, // final transition value
                 Transition.CUBIC_INTERPOLATOR_FLOAT, // use a cubic interpolator
-                cycleLength/2, // transtion fully over half a day
+                cycleLength/2, // transition fully over half a day
                 Transition.TransitionType.TRANSITION_BACK_AND_FORTH,
                 null); // nothing further to execute upon reaching final value
         return night;
