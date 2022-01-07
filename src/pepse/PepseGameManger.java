@@ -8,9 +8,11 @@ import danogl.gui.ImageReader;
 import danogl.gui.SoundReader;
 import danogl.gui.UserInputListener;
 import danogl.gui.WindowController;
+import danogl.gui.rendering.AnimationRenderable;
 import danogl.gui.rendering.Camera;
 import danogl.gui.rendering.ImageRenderable;
 import danogl.util.Vector2;
+import pepse.util.EnergyDisplay;
 import pepse.world.Avatar;
 import pepse.world.Block;
 import pepse.world.Sky;
@@ -23,6 +25,7 @@ import pepse.world.trees.Tree;
 
 import java.awt.*;
 
+import java.awt.image.AreaAveragingScaleFilter;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
@@ -32,8 +35,12 @@ public class PepseGameManger extends GameManager {
     public static final float GRAVITY = 500;
     public static final float VELOCITY_X = 300;
     public static final float VELOCITY_Y = -300;
-    private static final String PLAYER_IMAGE = "assets/player_image.png";
+    private static final String PLAYER_IMAGE_STANDING = "assets/player_standing.png";
+    private static final String[] PLAYER_WALKING = new String[]{"assets/player_left.png",
+            "assets/player_right.png"};
     private static final Vector2 PLAYER_DIMENSIONS = new Vector2(28, 50);
+    private static final float PADDING = 5;
+    private static final float TEXT_SIZE = 30;
     private static final int treeLayer = Layer.STATIC_OBJECTS + 1;
     private static final int groundLayer = Layer.STATIC_OBJECTS;
     private static final int liffLayer = Layer.STATIC_OBJECTS + 2;
@@ -50,6 +57,7 @@ public class PepseGameManger extends GameManager {
     private float leftBoundary;
     private float rightBoundary;
     private float farRightBoundary;
+    private EnergyDisplay energyDisplay;
     public static final int DAY_LENGTH = 30;
     private static final Color BASIC_SUN_HALO_COLOR = new Color(255, 255, 0, 20);
     private boolean createdCollision = false;
@@ -73,6 +81,7 @@ public class PepseGameManger extends GameManager {
     public void update(float deltaTime) {
         super.update(deltaTime);
         boolean needToCreateCollision = false;
+        energyDisplay.update();
         if (avatar.getCenter().x() < currentScreen * screenSize){
             currentScreen -= 1;
             updateBoundaries();
@@ -121,7 +130,6 @@ public class PepseGameManger extends GameManager {
         this.currentScreen = 0;
         this.windowDimensions = windowController.getWindowDimensions();
         this.screenSize = windowDimensions.x();
-
         Sky.create(this.gameObjects(), windowDimensions, Layer.BACKGROUND);
         terrain = new Terrain(this.gameObjects(), windowDimensions, groundLayer, SEED);
         terrain.createInRange((int) -screenSize, (int) (2 * screenSize));
@@ -146,6 +154,10 @@ public class PepseGameManger extends GameManager {
 
         setCamera(new Camera(avatar, Vector2.ZERO,
                 windowController.getWindowDimensions(), windowController.getWindowDimensions()));
+        this.energyDisplay = new EnergyDisplay(
+                new Vector2(PADDING, PADDING),
+                new Vector2(TEXT_SIZE, TEXT_SIZE), () -> avatar.getEnergy());
+        gameObjects().addGameObject(energyDisplay.getEnergyText(), Layer.BACKGROUND);
         Night.create(this.gameObjects(), Layer.FOREGROUND, windowController.getWindowDimensions(), DAY_LENGTH);
         GameObject sun = Sun.create(this.gameObjects(), Layer.BACKGROUND, windowController.getWindowDimensions(), DAY_LENGTH);
         SunHalo.create(this.gameObjects(), Layer.BACKGROUND + 1, sun, BASIC_SUN_HALO_COLOR);
@@ -155,8 +167,9 @@ public class PepseGameManger extends GameManager {
                                       int layer, Vector2 topLeftCorner,
                                       UserInputListener inputListener,
                                       ImageReader imageReader){
-        ImageRenderable avatarRenderer = imageReader.readImage(PLAYER_IMAGE, true);
-        Avatar avatar = new Avatar(topLeftCorner, PLAYER_DIMENSIONS, avatarRenderer, inputListener);
+        ImageRenderable avatarStanding = imageReader.readImage(PLAYER_IMAGE_STANDING, false);
+        AnimationRenderable avatarWalking = new AnimationRenderable(PLAYER_WALKING, imageReader, false, 0.25);
+        Avatar avatar = new Avatar(topLeftCorner, PLAYER_DIMENSIONS, avatarStanding, avatarWalking, inputListener);
         gameObjects.addGameObject(avatar, layer);
         return avatar;
     }
