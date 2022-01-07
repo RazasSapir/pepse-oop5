@@ -39,13 +39,13 @@ public class PepseGameManger extends GameManager {
     public static final float GRAVITY = 500;
     public static final float VELOCITY_X = 300;
     public static final float VELOCITY_Y = -300;
-    private static final String PLAYER_IMAGE_STANDING = "assets/player_standing.png";
-    private static final String[] PLAYER_WALKING = new String[]{"assets/player_left.png",
-            "assets/player_right.png"};
+    private static final String PLAYER_IMAGE_STANDING = "pepse/assets/player_standing.png";
+    private static final String[] PLAYER_WALKING = new String[]{"pepse/assets/player_left.png",
+            "pepse/assets/player_right.png"};
     private static final Vector2 PLAYER_DIMENSIONS = new Vector2(28, 49);
-    private static final String ANIMAL_IMAGE_STANDING = "assets/animal1_standing.png";
-    private static final String[] ANIMAL_WALKING = new String[]{"assets/animal1_left.png",
-            "assets/animal1_right.png"};
+    private static final String ANIMAL_IMAGE_STANDING = "pepse/assets/animal1_standing.png";
+    private static final String[] ANIMAL_WALKING = new String[]{"pepse/assets/animal1_left.png",
+            "pepse/assets/animal1_right.png"};
     private static final float PADDING = 5;
     private static final float TEXT_SIZE = 30;
     private static final int treeLayer = Layer.STATIC_OBJECTS + 1;
