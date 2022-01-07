@@ -7,7 +7,6 @@ import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 import pepse.PepseGameManger;
 
-import javax.swing.*;
 import java.awt.event.KeyEvent;
 
 public class Avatar extends GameObject {

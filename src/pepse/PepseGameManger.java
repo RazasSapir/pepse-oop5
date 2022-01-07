@@ -18,7 +18,6 @@ import pepse.world.Block;
 import pepse.world.Sky;
 import pepse.world.Terrain;
 
-import java.awt.image.AreaAveragingScaleFilter;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
