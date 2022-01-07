@@ -18,6 +18,8 @@ import pepse.world.Terrain;
 import pepse.world.daynight.Night;
 import pepse.world.daynight.Sun;
 import pepse.world.daynight.SunHalo;
+import pepse.world.trees.Leaf;
+import pepse.world.trees.Tree;
 
 import java.awt.*;
 
@@ -32,6 +34,12 @@ public class PepseGameManger extends GameManager {
     public static final float VELOCITY_Y = -300;
     private static final String PLAYER_IMAGE = "assets/player_image.png";
     private static final Vector2 PLAYER_DIMENSIONS = new Vector2(28, 50);
+    private static final int treeLayer = Layer.STATIC_OBJECTS + 1;
+    private static final int groundLayer = Layer.STATIC_OBJECTS;
+    private static final int liffLayer = Layer.STATIC_OBJECTS + 2;
+    private static final int avatarLayer = Layer.DEFAULT;
+
+
     private UserInputListener inputListener;
     private Terrain terrain;
     private Vector2 windowDimensions;
@@ -44,6 +52,7 @@ public class PepseGameManger extends GameManager {
     private float farRightBoundary;
     public static final int DAY_LENGTH = 30;
     private static final Color BASIC_SUN_HALO_COLOR = new Color(255, 255, 0, 20);
+    private boolean createdCollision = false;
 
 
     public PepseGameManger() {
@@ -63,29 +72,43 @@ public class PepseGameManger extends GameManager {
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
+        boolean needToCreateCollision = false;
         if (avatar.getCenter().x() < currentScreen * screenSize){
             currentScreen -= 1;
             updateBoundaries();
             terrain.createInRange((int) farLeftBoundary, (int) leftBoundary);
+            needToCreateCollision = Tree.createInRange((int) farLeftBoundary, (int) leftBoundary, terrain, this.gameObjects(),
+                    treeLayer, liffLayer);
             removeObjectsByCondition(g -> g.getTopLeftCorner().x() > roundToBlock(farRightBoundary));
         }
         else if (avatar.getCenter().x() > (currentScreen + 1) * screenSize){
             currentScreen += 1;
             updateBoundaries();
             terrain.createInRange((int) rightBoundary, (int) farRightBoundary);
+            needToCreateCollision = Tree.createInRange((int) rightBoundary, (int) farRightBoundary, terrain, this.gameObjects(),
+                    treeLayer, liffLayer);
+
+            // remove the trees and irrelevant terrain
             removeObjectsByCondition(g -> g.getTopLeftCorner().x() < roundToBlock(farLeftBoundary));
+        }
+        if(!createdCollision && needToCreateCollision){
+            gameObjects().layers().shouldLayersCollide(liffLayer, groundLayer, true);
+            gameObjects().layers().shouldLayersCollide(treeLayer, avatarLayer, true);
+            createdCollision = true;
         }
     }
 
     private void removeObjectsByCondition(Predicate<GameObject> condition) {
         ArrayList<GameObject> tempToRemove = new ArrayList<>();
         for (GameObject g : gameObjects()) {
-            if (condition.test(g) && g instanceof Block) {
+            if (condition.test(g) && (g instanceof Block || g instanceof Leaf)) {
                 tempToRemove.add(g);
             }
         }
         for (GameObject g : tempToRemove) {
+            gameObjects().removeGameObject(g, treeLayer);
             gameObjects().removeGameObject(g, Layer.STATIC_OBJECTS);
+            gameObjects().removeGameObject(g, liffLayer);
             gameObjects().removeGameObject(g, Layer.BACKGROUND);
         }
     }
@@ -98,11 +121,29 @@ public class PepseGameManger extends GameManager {
         this.currentScreen = 0;
         this.windowDimensions = windowController.getWindowDimensions();
         this.screenSize = windowDimensions.x();
+
         Sky.create(this.gameObjects(), windowDimensions, Layer.BACKGROUND);
-        terrain = new Terrain(this.gameObjects(), windowDimensions, Layer.STATIC_OBJECTS, SEED);
+        terrain = new Terrain(this.gameObjects(), windowDimensions, groundLayer, SEED);
         terrain.createInRange((int) -screenSize, (int) (2 * screenSize));
+
+        boolean create1 = Tree.createInRange((int) -screenSize, (int) 0, terrain, this.gameObjects(), treeLayer,
+                liffLayer);
+        boolean create2 = Tree.createInRange((int) 0, (int) screenSize, terrain, this.gameObjects(), treeLayer,
+                liffLayer);
+        boolean create3 = Tree.createInRange((int) screenSize, (int)(2 * screenSize), terrain, this.gameObjects(), treeLayer,
+                liffLayer);
+
+
         Vector2 avatarPosition = new Vector2(windowDimensions.x() * 0.5F, 0);
-        this.avatar = createAvatar(gameObjects(), Layer.DEFAULT, avatarPosition, inputListener, imageReader);
+        this.avatar = createAvatar(gameObjects(), avatarLayer, avatarPosition, inputListener, imageReader);
+
+        // create collision between the layers only if they're aren't empty
+        if(create1 || create2 || create3){
+            gameObjects().layers().shouldLayersCollide(liffLayer, groundLayer, true);
+            gameObjects().layers().shouldLayersCollide(treeLayer, avatarLayer, true);
+            createdCollision = true;
+        }
+
         setCamera(new Camera(avatar, Vector2.ZERO,
                 windowController.getWindowDimensions(), windowController.getWindowDimensions()));
         Night.create(this.gameObjects(), Layer.FOREGROUND, windowController.getWindowDimensions(), DAY_LENGTH);
