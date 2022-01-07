@@ -7,8 +7,6 @@ Differences between UML diagrams:
     There weren't major changes between the UML diagrams.
 
 
-
-
 explanation on how we made the world endless:
 
     We made the game world endless by managing only 3 screens at a time - the current screen the avatar is in,
@@ -17,6 +15,7 @@ explanation on how we made the world endless:
     leaves, animals and terrain. We also created a new screen and objects in it, so that the avatar will always be in the
     middle screen. We used the random possible to restore tactics that was shown in the excercise instructions to fulfill
     this task.
+
 
 explanation on implementation of the Tree package:
 
