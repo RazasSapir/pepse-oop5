@@ -35,7 +35,7 @@ public class Terrain {
      */
     public Terrain(GameObjectCollection gameObjects,
                    int groundLayer, Vector2 windowDimensions,
-                   long seed) {
+                   int seed) {
         this.gameObjects = gameObjects;
         this.groundLayer = groundLayer;
         double BASIC_GROUND_FACTOR = 2.0 / 3.0;
