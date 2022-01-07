@@ -4,8 +4,18 @@ arile 324955756
 
 Differences between UML diagrams:
 
-    There weren't major changes between the UML diagrams. The main changes were the the class "avatar" doesn't extend
-    "animal", and these are completely separate classes.
+    There weren't major changes between the UML diagrams.
+    1.  The main changes were the the class "avatar" doesn't extend
+        "animal", and these are completely separate classes. We thought that animal and avatar are going to have many fields
+        in common. However, eventually they had a completely different implementation.
+    2.  Another change is that Sun and SunHalo do not extend GameObject but create a GameObject and return it.
+    3.  A third change is that Tree does not extend GameObject but creates a GameObject for the trunk and create its
+        leaves (which are GameObjects On their own.
+    legend for "after_uml.png":
+        * dashed line - creates.
+        * blue line - extends.
+        * full line with a rhombus at the beginning - owns.
+
 
 
 explanation on how we made the world endless:
