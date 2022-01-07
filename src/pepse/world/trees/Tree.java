@@ -19,10 +19,10 @@ public class Tree {
     public static final Color BASE_TREE_COLOR = new Color(100, 50, 20);
     public static final Color BASE_LEAF_COLOR = new Color(50, 200, 30);
 
-    private Terrain terrain;
-    private GameObjectCollection gameObjects;
-    private int layer;
-    private int leavesLayer;
+    private final Terrain terrain;
+    private final GameObjectCollection gameObjects;
+    private final int layer;
+    private final int leavesLayer;
 
     /**
      * constructor for the Tree object.
@@ -87,7 +87,6 @@ public class Tree {
         maxX = (int) (Math.floor((float) maxX / Block.SIZE) + 1) * Block.SIZE;
         Random value_number = new Random(Objects.hash(minX, SEED));
 
-        boolean createdLeaves = false;
         for(int curr_value = minX; maxX > curr_value; curr_value += Block.SIZE){
             // add tree in probability of 1 / 10
             if(value_number.nextInt() % 10 == 1){
@@ -100,7 +99,6 @@ public class Tree {
                         curr_height, this.gameObjects, layer);
                 createLeafCollection(new Vector2(curr_value, roundedHeight - Block.SIZE * curr_height),
                         curr_height, gameObjects, leavesLayer);
-                createdLeaves = true;
             }
         }
     }

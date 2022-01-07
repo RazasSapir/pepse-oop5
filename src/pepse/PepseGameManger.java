@@ -53,8 +53,7 @@ public class PepseGameManger extends GameManager {
     private static final int SAFETY_GAP = 200;
     private static final Vector2 ANIMAL_DIMENSIONS =  new Vector2(Block.SIZE, Block.SIZE);
     private static final Color BASIC_SUN_HALO_COLOR = new Color(255, 255, 0, 20);
-
-
+    public static final int BASIC_ENERGY_LAYER = Layer.BACKGROUND + 20;
 
 
     private ImageReader imageReader;
@@ -98,7 +97,6 @@ public class PepseGameManger extends GameManager {
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-        boolean needToCreateCollision = false;
         energyDisplay.update();
         if (avatar.getCenter().x() < currentScreen * screenSize){
             currentScreen -= 1;
@@ -120,13 +118,13 @@ public class PepseGameManger extends GameManager {
             // remove irrelevant objects
             removeObjectsByCondition(g -> g.getTopLeftCorner().x() < roundToBlock(farLeftBoundary));
         }
-        if (!createdCollision && needToCreateCollision) {
+        if (!createdCollision) {
             try{
                 gameObjects().layers().shouldLayersCollide(liffLayer, groundLayer, true);
                 gameObjects().layers().shouldLayersCollide(treeLayer, avatarLayer, true);
                 createdCollision = true;
             }
-            catch(java.util.NoSuchElementException e){
+            catch(java.util.NoSuchElementException ignored){
             }
         }
     }
@@ -179,8 +177,8 @@ public class PepseGameManger extends GameManager {
         this.avatar = Avatar.create(gameObjects(), avatarLayer, avatarPosition, inputListener, imageReader);
 
 
-        createAnimalsInRange((int) -screenSize, (int) 0, terrain, this.gameObjects(), avatarLayer, imageReader);
-        createAnimalsInRange((int) 0, (int) screenSize, terrain, this.gameObjects(), avatarLayer, imageReader);
+        createAnimalsInRange((int) -screenSize, 0, terrain, this.gameObjects(), avatarLayer, imageReader);
+        createAnimalsInRange(0, (int) screenSize, terrain, this.gameObjects(), avatarLayer, imageReader);
         createAnimalsInRange((int) screenSize, (int)(2 * screenSize), terrain, this.gameObjects(), avatarLayer, imageReader);
 
 
@@ -191,7 +189,7 @@ public class PepseGameManger extends GameManager {
         this.energyDisplay = new EnergyDisplay(
                 new Vector2(PADDING, PADDING),
                 new Vector2(TEXT_SIZE, TEXT_SIZE), avatar::getEnergy);
-        gameObjects().addGameObject(energyDisplay.getEnergyText(), Layer.BACKGROUND + 20);
+        gameObjects().addGameObject(energyDisplay.getEnergyText(), BASIC_ENERGY_LAYER);
         // Init night, sun and sun halo
         Night.create(this.gameObjects(), Layer.FOREGROUND, windowController.getWindowDimensions(), DAY_LENGTH);
         GameObject sun = Sun.create(this.gameObjects(), Layer.BACKGROUND, windowController.getWindowDimensions(), DAY_LENGTH);
@@ -211,7 +209,7 @@ public class PepseGameManger extends GameManager {
             gameObjects().layers().shouldLayersCollide(treeLayer, avatarLayer, true);
             createdCollision = true;
         }
-        catch(java.util.NoSuchElementException e){
+        catch(java.util.NoSuchElementException ignored){
         }
     }
 
@@ -243,7 +241,7 @@ public class PepseGameManger extends GameManager {
             int curr_X = (int)(Math.random() * (maxX - minX - SAFETY_GAP + 1) + minX + SAFETY_GAP);
             double height = Math.floor(terrain.groundHeightAt((float) curr_X / Block.SIZE) / Block.SIZE) * Block.SIZE;
             float roundedHeight = Math.max((int) (height - (height % Block.SIZE)), 0);
-            gameObjects.addGameObject(new Animal(new Vector2(curr_X, (float)(roundedHeight - ANIMAL_DIMENSIONS.y())),
+            gameObjects.addGameObject(new Animal(new Vector2(curr_X, (roundedHeight - ANIMAL_DIMENSIONS.y())),
                     ANIMAL_DIMENSIONS, animalStanding, animalWalking, SEED, minX, maxX), layer);
         }
 

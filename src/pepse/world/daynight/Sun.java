@@ -18,6 +18,7 @@ public class Sun {
     private static final Color BASIC_SUN_COLOR = Color.YELLOW;
     private static final String SUN_TAG = "sun";
     private static final Vector2 SUN_SIZE = new Vector2(100, 100);
+    public static final float ELLIPSE_RADIUS_FACTOR = 0.7f;
     private static Vector2 middleScreen;
 
 
@@ -28,7 +29,7 @@ public class Sun {
      */
     private static void setNewCenter(float curr_angle, GameObject curr_obj){
         Vector2 new_place = middleScreen.add(new Vector2((float)Math.sin(Math.toRadians(curr_angle)) * middleScreen.y()
-                , (float)(-1 * Math.cos(Math.toRadians(curr_angle))) * middleScreen.y() * 0.7f));
+                , (float)(-1 * Math.cos(Math.toRadians(curr_angle))) * middleScreen.y() * ELLIPSE_RADIUS_FACTOR));
         curr_obj.setCenter(new_place);
     }
 
@@ -50,7 +51,7 @@ public class Sun {
         gameObjects.addGameObject(sun, layer);
         sun.setTag(SUN_TAG);
         middleScreen = new Vector2(windowDimensions.x() / 2, windowDimensions.y());
-        new Transition<Float>(
+        new Transition<>(
                 sun, // the game object being changed
                (curr_angle) -> setNewCenter(curr_angle, sun), // the method to call
                 0f, // initial transition value

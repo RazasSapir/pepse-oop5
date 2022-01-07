@@ -16,12 +16,15 @@ public class Leaf extends GameObject {
     public static final int Y_VELOCITY_LEAF = 75;
     public static final int VELOCITY_CYCLE_LENGTH = 3;
     public static final int MAX_DEATH_TIME = 25;
+    public static final float ANGLE_FACTOR = 3f;
+    public static final float SIZE_FACTOR = 3f;
+    public static final double WIDTH_FACTOR = 0.8;
     private boolean onReturn = false;
     private boolean onSmaller = true;
     private final float initWidth;
     private float currLifeTime;
     private Transition<Float> movementTransition;
-    private float currDeathTime;  //todo: no one uses this field
+    private float currDeathTime;
     private final Vector2 initPos;
     private ScheduledTask alterAngle;
     private ScheduledTask alterSize;
@@ -55,8 +58,8 @@ public class Leaf extends GameObject {
         this.transform().setVelocity(Vector2.ZERO);
 
         alterAngle = new ScheduledTask(
-                this, (float) (Math.random() * 3f), true, this::alterAngle);
-        alterSize = new ScheduledTask(this, (float) (Math.random() * 3f), true, this::alterWidth);
+                this, (float) (Math.random() * ANGLE_FACTOR), true, this::alterAngle);
+        alterSize = new ScheduledTask(this, (float) (Math.random() * SIZE_FACTOR), true, this::alterWidth);
         // declare the dropout phase
         alterDive = new ScheduledTask(
                 this, currLifeTime, true, this::diveDown);
@@ -87,7 +90,7 @@ public class Leaf extends GameObject {
     private void alterWidth() {
         if (onSmaller) {
             this.setDimensions(new Vector2(this.getDimensions().x(), this.getDimensions().x() - 2f));
-            if (this.getDimensions().x() < 0.8 * initWidth) {
+            if (this.getDimensions().x() < WIDTH_FACTOR * initWidth) {
                 onSmaller = false;
             }
         } else {

@@ -21,6 +21,9 @@ import java.awt.event.KeyEvent;
 public class Avatar extends GameObject {
     public static final int INITIAL_ENERGY = 100;
     public static final double ENERGY_DELTA = 0.5;
+    public static final double TIME_BETWEEN_CLIPS = 0.25;
+    public static final int FLYING_ANGLE = -90;
+    public static final int STANDING_ANGLE = 0;
     private final UserInputListener inputListener;
     private final Renderable imageStandingRenderer;
     private final AnimationRenderable animationRanderer;
@@ -65,7 +68,7 @@ public class Avatar extends GameObject {
                                       UserInputListener inputListener,
                                       ImageReader imageReader) {
         ImageRenderable avatarStanding = imageReader.readImage(PLAYER_IMAGE_STANDING, false);
-        AnimationRenderable avatarWalking = new AnimationRenderable(PLAYER_WALKING, imageReader, false, 0.25);
+        AnimationRenderable avatarWalking = new AnimationRenderable(PLAYER_WALKING, imageReader, false, TIME_BETWEEN_CLIPS);
         Avatar avatar = new Avatar(topLeftCorner, PLAYER_DIMENSIONS, avatarStanding, avatarWalking, inputListener);
         gameObjects.addGameObject(avatar, layer);
         return avatar;
@@ -93,7 +96,7 @@ public class Avatar extends GameObject {
         }
         else if (inputListener.isKeyPressed(KeyEvent.VK_SPACE) && getVelocity().y() == 0)
             transform().setVelocityY(PepseGameManger.VELOCITY_Y);
-        else if (getVelocity().x() == 0 && getVelocity().y() == 0 && energy < 100) {
+        else if (getVelocity().x() == 0 && getVelocity().y() == 0 && energy < INITIAL_ENERGY) {
             this.energy += ENERGY_DELTA;
         }
     }
@@ -111,11 +114,11 @@ public class Avatar extends GameObject {
     private void handle_renderer() {
         // Handle flying mode
         if (isFlying) {
-            renderer().setRenderableAngle(-90);
+            renderer().setRenderableAngle(FLYING_ANGLE);
             renderer().setRenderable(imageStandingRenderer);
         }
         else {
-            renderer().setRenderableAngle(0);
+            renderer().setRenderableAngle(STANDING_ANGLE);
             renderer().setRenderable(animationRanderer);
         }
         // Handle Walking mode

@@ -24,7 +24,7 @@ public class Terrain {
     private final NoiseGenerator NoiseGenerator;
     private static final int TERRAIN_DEPTH = 30;
     private static final Color BASE_GROUND_COLOR = new Color(212, 123, 74);
-
+    private static final int BASIC_TERRAIN_LAYER = Layer.BACKGROUND + 10;
 
     /**
      * Constructor for the terrain Handler
@@ -38,7 +38,8 @@ public class Terrain {
                    long seed) {
         this.gameObjects = gameObjects;
         this.groundLayer = groundLayer;
-        this.groundHeightAtX0 = windowDimensions.y() * 2 / 3;
+        double BASIC_GROUND_FACTOR = 2.0 / 3.0;
+        this.groundHeightAtX0 = windowDimensions.y() * BASIC_GROUND_FACTOR;
         this.groundDeltaFactor = windowDimensions.y();
         this.NoiseGenerator = new NoiseGenerator(seed);
     }
@@ -69,7 +70,7 @@ public class Terrain {
                 if (j < INTERACTIVE_DEPTH)
                     this.gameObjects.addGameObject(block, this.groundLayer);
                 else
-                    this.gameObjects.addGameObject(block, Layer.BACKGROUND + 10);
+                    this.gameObjects.addGameObject(block, BASIC_TERRAIN_LAYER);
                 block.setTag(GROUND_BLOCK);
             }
         }

@@ -14,9 +14,10 @@ import java.util.Random;
  * @authors Raz Sapir and Ari Lehavi
  */
 public class Animal extends GameObject {
+    public static final int FLY_COUNTER_VALUE = 20;
+    public static final int HORIZONTAL_COUNTER_VALUE = 100;
     private final Renderable imageStandingRenderer;
     private final AnimationRenderable animationRenderer;
-    private final int SAFETY_GAP = 200;
     private static final int MAX_X_VEL = 100;
     private int xVel;
     private final Random randomizer;
@@ -24,8 +25,8 @@ public class Animal extends GameObject {
     private static final float VERTICAL_THRESHOLD = 0.5f;
 
 
-    private int minX;
-    private int maxX;
+    private final int minX;
+    private final int maxX;
     private boolean onFly = false;
     private boolean onMovementHorizontal = false;
     private int onMovementHorizontalCounter = 50;
@@ -65,7 +66,7 @@ public class Animal extends GameObject {
         if(onFly){
             if(this.transform().getVelocity().y() < 0 && this.onFlyCounter == 0) {
                 this.transform().setVelocityY((float) -1 * this.getVelocity().y());
-                this.onFlyCounter = 20;
+                this.onFlyCounter = FLY_COUNTER_VALUE;
             }
             else{
                 this.onFlyCounter -= 1;
@@ -75,7 +76,7 @@ public class Animal extends GameObject {
         if(onMovementHorizontal){
             if(this.onMovementHorizontalCounter == 0){
                 onMovementHorizontal = false;
-                this.onMovementHorizontalCounter = 100;
+                this.onMovementHorizontalCounter = HORIZONTAL_COUNTER_VALUE;
                 this.transform().setVelocityX(0);
             }
             else{
@@ -101,6 +102,7 @@ public class Animal extends GameObject {
         }
 
         // put the animal in the wanted range
+        int SAFETY_GAP = 200;
         if((this.getCenter().x() < this.minX + SAFETY_GAP) && this.getVelocity().x() < 0){
             this.setVelocity(new Vector2(-1 * this.getVelocity().x(), this.getVelocity().y()));
         }
@@ -124,7 +126,7 @@ public class Animal extends GameObject {
         if(onFly && this.transform().getVelocity().y() > 0){
             onFly = false;
             this.transform().setVelocityY(0);
-            this.onFlyCounter = 20;
+            this.onFlyCounter = FLY_COUNTER_VALUE;
         }
     }
 
