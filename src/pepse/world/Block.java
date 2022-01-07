@@ -5,6 +5,11 @@ import danogl.components.GameObjectPhysics;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 
+/**
+ * class to manage the "block" object.
+ * It is in charge of creating a new block (a cube of a certain size and color)
+ * @authors Raz Sapir and Ari Lehavi
+ */
 public class Block extends GameObject {
     public static final int SIZE = 30;
 

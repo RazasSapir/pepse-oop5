@@ -9,6 +9,11 @@ import pepse.util.NoiseGenerator;
 
 import java.awt.*;
 
+/**
+ * class to manage the Terrain object.
+ * It is in charge of presenting the terrain throughout the game and changing the surface when needed
+ * @authors Raz Sapir and Ari Lehavi
+ */
 public class Terrain {
     public static final String GROUND_BLOCK = "Ground Block";
     public static final int INTERACTIVE_DEPTH = 2;

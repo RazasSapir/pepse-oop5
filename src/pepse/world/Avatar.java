@@ -9,6 +9,12 @@ import pepse.PepseGameManger;
 
 import java.awt.event.KeyEvent;
 
+/**
+ * class to manage the Avatar object.
+ * It is in charge of presenting the avatar and update it's position and state throughout the game
+ * according to the user's choice
+ * @authors Raz Sapir and Ari Lehavi
+ */
 public class Avatar extends GameObject {
     public static final int INITIAL_ENERGY = 100;
     public static final double ENERGY_DELTA = 0.5;

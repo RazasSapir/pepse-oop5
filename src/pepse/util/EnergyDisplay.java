@@ -9,6 +9,11 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import danogl.util.Vector2;
 
+/**
+ * class to manage the representation of the energy levels of the avatar.
+ * It is in charge of presenting the energy level and changing it on the screen
+ * @authors Raz Sapir and Ari Lehavi
+ */
 public class EnergyDisplay {
 
     public static final String ENERGY_PREFACE = "Energy: ";

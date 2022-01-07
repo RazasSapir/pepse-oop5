@@ -8,6 +8,11 @@ import danogl.util.Vector2;
 
 import java.awt.*;
 
+/**
+ * class to manage the Sky object.
+ * It is in charge of presenting the sky in the beginning of the game statically
+ * @authors Raz Sapir and Ari Lehavi
+ */
 public class Sky {
     private static final Color BASIC_SKY_COLOR = Color.decode("#80C6E5");
     private static final String SKY_TAG = "sky";

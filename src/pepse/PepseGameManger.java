@@ -28,9 +28,14 @@ import pepse.world.trees.Tree;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
+/**
+ * class to manage the entire game.
+ * It is in charge of updating the world in which the avatar is on throughout the game.
+ * @authors Raz Sapir and Ari Lehavi
+ */
 public class PepseGameManger extends GameManager {
 
-    public static final int SEED = 100;
+    public static final int SEED = 42;
     public static final float GRAVITY = 500;
     public static final float VELOCITY_X = 300;
     public static final float VELOCITY_Y = -300;
@@ -89,7 +94,6 @@ public class PepseGameManger extends GameManager {
 
     /**
      * Updates the games based on the position's of the avatar
-     *
      * @param deltaTime time between frames
      */
     @Override
@@ -128,7 +132,7 @@ public class PepseGameManger extends GameManager {
 
     /**
      * Helper function to remove the objects far away from the player
-     *
+     * makes the program run smoother
      * @param condition Predicate<GameObject> the check if the given GameObject should be deleted
      */
     private void removeObjectsByCondition(Predicate<GameObject> condition) {
@@ -148,7 +152,6 @@ public class PepseGameManger extends GameManager {
 
     /**
      * Override initializeGame - inits the different objects
-     *
      * @param imageReader      ImageReader for rendering Images
      * @param soundReader      SoundReader for rendering sound
      * @param inputListener    UserInputListener to handle user's input
@@ -231,7 +234,6 @@ public class PepseGameManger extends GameManager {
         return avatar;
     }
 
-
     /**
      * Helper function to round x value to Block.SIZE
      * @param x float value to round
@@ -241,6 +243,15 @@ public class PepseGameManger extends GameManager {
         return (int) (Math.floor(x / Block.SIZE) + 1) * Block.SIZE;
     }
 
+    /**
+     * helper function to create a random ammount of animals in a certain area in the game.
+     * @param minX the minimal x value of the area to create the animals in
+     * @param maxX the maximal x value of the area to create the animals in
+     * @param terrain the terrain the animals are on
+     * @param gameObjects the game object list of the game
+     * @param layer the layer to draw the animals in
+     * @param imageReader the imageReader of the game
+     */
     public static void createAnimalsInRange(int minX, int maxX, Terrain terrain, GameObjectCollection gameObjects, int layer,
     ImageReader imageReader){
         int curr_animals_number = (int)(Math.random() * MAX_ANIMALS_IN_RANGE);
