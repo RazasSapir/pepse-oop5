@@ -8,14 +8,17 @@ import danogl.gui.ImageReader;
 import danogl.gui.SoundReader;
 import danogl.gui.UserInputListener;
 import danogl.gui.WindowController;
+import danogl.gui.rendering.AnimationRenderable;
 import danogl.gui.rendering.Camera;
 import danogl.gui.rendering.ImageRenderable;
 import danogl.util.Vector2;
+import pepse.util.EnergyDisplay;
 import pepse.world.Avatar;
 import pepse.world.Block;
 import pepse.world.Sky;
 import pepse.world.Terrain;
 
+import java.awt.image.AreaAveragingScaleFilter;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
@@ -25,8 +28,12 @@ public class PepseGameManger extends GameManager {
     public static final float GRAVITY = 500;
     public static final float VELOCITY_X = 300;
     public static final float VELOCITY_Y = -300;
-    private static final String PLAYER_IMAGE = "assets/player_image.png";
+    private static final String PLAYER_IMAGE_STANDING = "assets/player_standing.png";
+    private static final String[] PLAYER_WALKING = new String[]{"assets/player_left.png",
+            "assets/player_right.png"};
     private static final Vector2 PLAYER_DIMENSIONS = new Vector2(28, 50);
+    private static final float PADDING = 5;
+    private static final float TEXT_SIZE = 30;
     private UserInputListener inputListener;
     private Terrain terrain;
     private Vector2 windowDimensions;
@@ -37,6 +44,7 @@ public class PepseGameManger extends GameManager {
     private float leftBoundary;
     private float rightBoundary;
     private float farRightBoundary;
+    private EnergyDisplay energyDisplay;
 
     public PepseGameManger() {
 
@@ -55,6 +63,7 @@ public class PepseGameManger extends GameManager {
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
+        energyDisplay.update();
         if (avatar.getCenter().x() < currentScreen * screenSize){
             currentScreen -= 1;
             updateBoundaries();
@@ -97,14 +106,19 @@ public class PepseGameManger extends GameManager {
         this.avatar = createAvatar(gameObjects(), Layer.DEFAULT, avatarPosition, inputListener, imageReader);
         setCamera(new Camera(avatar, Vector2.ZERO,
                 windowController.getWindowDimensions(), windowController.getWindowDimensions()));
+        this.energyDisplay = new EnergyDisplay(
+                new Vector2(PADDING, PADDING),
+                new Vector2(TEXT_SIZE, TEXT_SIZE), () -> avatar.getEnergy());
+        gameObjects().addGameObject(energyDisplay.getEnergyText(), Layer.BACKGROUND);
     }
 
     public static Avatar createAvatar(GameObjectCollection gameObjects,
                                       int layer, Vector2 topLeftCorner,
                                       UserInputListener inputListener,
                                       ImageReader imageReader){
-        ImageRenderable avatarRenderer = imageReader.readImage(PLAYER_IMAGE, true);
-        Avatar avatar = new Avatar(topLeftCorner, PLAYER_DIMENSIONS, avatarRenderer, inputListener);
+        ImageRenderable avatarStanding = imageReader.readImage(PLAYER_IMAGE_STANDING, false);
+        AnimationRenderable avatarWalking = new AnimationRenderable(PLAYER_WALKING, imageReader, false, 0.25);
+        Avatar avatar = new Avatar(topLeftCorner, PLAYER_DIMENSIONS, avatarStanding, avatarWalking, inputListener);
         gameObjects.addGameObject(avatar, layer);
         return avatar;
     }
