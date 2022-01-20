@@ -17,10 +17,10 @@ import java.awt.*;
 public class Terrain {
     public static final String GROUND_BLOCK = "Ground Block";
     public static final int INTERACTIVE_DEPTH = 2;
-    private final double groundDeltaFactor;
+    private final float groundDeltaFactor;
     private final GameObjectCollection gameObjects;
     private final int groundLayer;
-    private final double groundHeightAtX0;
+    private final float groundHeightAtX0;
     private final NoiseGenerator NoiseGenerator;
     private static final int TERRAIN_DEPTH = 30;
     private static final Color BASE_GROUND_COLOR = new Color(212, 123, 74);
@@ -39,7 +39,7 @@ public class Terrain {
         this.gameObjects = gameObjects;
         this.groundLayer = groundLayer;
         double BASIC_GROUND_FACTOR = 2.0 / 3.0;
-        this.groundHeightAtX0 = windowDimensions.y() * BASIC_GROUND_FACTOR;
+        this.groundHeightAtX0 = (float) (windowDimensions.y() * BASIC_GROUND_FACTOR);
         this.groundDeltaFactor = windowDimensions.y();
         this.NoiseGenerator = new NoiseGenerator(seed);
     }
@@ -48,8 +48,8 @@ public class Terrain {
      * @param x float value to check the ground's height at
      * @return height of the ground at position x - not rounded to block's size
      */
-    public double groundHeightAt(float x) {
-        return groundHeightAtX0 + groundDeltaFactor * this.NoiseGenerator.noise(x);
+    public float groundHeightAt(float x) {
+        return groundHeightAtX0 + groundDeltaFactor * (float) this.NoiseGenerator.noise(x);
     }
 
     /**
